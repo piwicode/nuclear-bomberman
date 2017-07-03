@@ -1,0 +1,30 @@
+{
+  "name": "nuclear-bomberman",
+  "version": "1.0.0",
+  "description": "Multiplayer arcade game.",
+  "main": "server.js",
+  "dependencies": {
+    "connect": "^3.6.2",
+    "cookie-parser": "^1.4.3",
+    "express-session": "^1.15.3",
+    "morgan": "^1.8.2",
+    "serve-favicon": "^2.4.3",
+    "serve-static": "^1.12.3",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/piwicode/nuclear-bomberman.git"
+  },
+  "author": "Pierre LABATUT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/piwicode/nuclear-bomberman/issues"
+  },
+  "homepage": "https://github.com/piwicode/nuclear-bomberman#readme"
+}

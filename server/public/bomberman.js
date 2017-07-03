@@ -827,6 +827,7 @@ function startup() {
 
         socket.on("set_session", function (newSid) {
             console.log("session identifier is ", newSid);
+            console.assert(newSid !== undefined)
             sid = newSid;
         });
 

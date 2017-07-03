@@ -9,14 +9,14 @@ var settings = {
 var shared = require("./public/shared.js");
 var maps = require("./public/maps");
 var connect = require('connect');
-var cookie = require('./node_modules/connect/node_modules/cookie');
-
+var cookie = require('cookie');
+var cookieParser = require('cookie-parser')
 var app = connect()
-    .use(connect.logger())
-    .use(connect.favicon("public/favicon.ico"))
-    .use(connect.cookieParser(settings.session.secret))
-    .use(connect.session(settings.session))
-    .use(connect.static('public'))
+    .use(require('morgan')('combined'))
+    .use(require('serve-favicon')("public/favicon.ico"))
+    .use(cookieParser(settings.session.secret))
+    .use(require('express-session')(settings.session))
+    .use(require('serve-static')('public'))
     .use(function (req, res, next) {
         if (req.url !== "/") next();
         res.writeHead(302, {'Location':'/bomberman.html'});
@@ -28,13 +28,14 @@ console.info("\n\u001b[36m | Server listening on port "+settings.port+".\u001b[0
 console.info("\u001b[36m | Connect to your ip with a chrome of firefox browser.\u001b[0m");
 console.info("\u001b[36m | Close this window to stop the server.\u001b[0m\n");
 
-var appSrv = app.listen(settings.port);
-var ioSrv = require('socket.io').listen(appSrv);
-ioSrv.enable('browser client minification');    // send minified client
-ioSrv.enable('browser client etag');            // apply etag caching logic based on version number
-ioSrv.enable('browser client gzip');            // gzip the file
-ioSrv.set('log level', 1);                      // reduce logging
-ioSrv.set('transports', ['xhr-polling']);         // enable websocket only
+var http = require('http').createServer(app);
+var appSrv = http.listen(settings.port);
+var ioSrv = require('socket.io')(http);
+//ioSrv.enable('browser client minification');    // send minified client
+//ioSrv.enable('browser client etag');            // apply etag caching logic based on version number
+//ioSrv.enable('browser client gzip');            // gzip the file
+//ioSrv.set('log level', 1);                      // reduce logging
+//ioSrv.set('transports', ['xhr-polling']);         // enable websocket only
 
 var endgame_sequence = function () {
     var seq = [];
@@ -282,7 +283,7 @@ ioSrv.set('authorization', function (data, accept) {
     if (data.headers.cookie) {
         // if there is, parse the cookie
         var codedCookies = cookie.parse(data.headers.cookie);
-        var clearCookies = connect.utils.parseSignedCookies(codedCookies, settings.session.secret);
+        var clearCookies = cookieParser.signedCookies(codedCookies, settings.session.secret);
         data.sid = clearCookies[settings.session.key];
     } else {
         // if there isn't, turn down the connection with a message
@@ -329,7 +330,7 @@ var playerCleaner = new PlayerCleaner();
 
 sockets.on('connection', function (socket) {
     // get back the sid extracted durring the authorization process
-    var sid = socket.handshake.sid;
+    var sid = socket.id;
 
     // Reset state cleanup on long disconnect
     playerCleaner.notifyConnect(sid);
